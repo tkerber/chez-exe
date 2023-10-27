@@ -69,6 +69,8 @@
 
 (compile-imported-libraries #t)
 (generate-wpo-files #t)
+(generate-inspector-information #f)
+(compile-profile #f)
 
 (define scheme-file (car args))
 (define compiler-args (append (static-compiler-args) (cdr args)))
