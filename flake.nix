@@ -8,9 +8,12 @@
     utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        bootpath = if system == "x86_64-darwin"
-                   then "${pkgs.chez}/lib/csv${pkgs.chez.version}/ta6osx"
-                   else "${pkgs.chez}/lib/csv${pkgs.chez.version}/ta6le";
+        bootpath = "${pkgs.chez}/lib/csv${pkgs.chez.version}/${{
+          x86_64-darwin = "ta6osx";
+          x86_64-linux = "ta6le";
+          aarch64-darwin = "tarm64osx";
+          aarch64-linux = "tarm64le";
+        }.${system}}";
         platformSpecificInputs = if system == "x86_64-darwin"
                                  then [ pkgs.darwin.libiconv ]
                                  else [ pkgs.libuuid ];
