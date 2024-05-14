@@ -14,9 +14,12 @@
           aarch64-darwin = "tarm64osx";
           aarch64-linux = "tarm64le";
         }.${system}}";
-        platformSpecificInputs = if system == "x86_64-darwin"
-                                 then [ pkgs.darwin.libiconv ]
-                                 else [ pkgs.libuuid ];
+        platformSpecificInputs = {
+          x86_64-darwin = [ pkgs.darwin.libiconv ];
+          x86_64-linux = [ pkgs.libuuid ];
+          aarch64-darwin = [ pkgs.darwin.libiconv ];
+          aarch64-linux = [ pkgs.libuuid ];
+        }.${system};
       in {
 
         packages.default = pkgs.stdenv.mkDerivation {
