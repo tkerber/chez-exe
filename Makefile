@@ -12,16 +12,19 @@ libdir ?= $(bootpath)
 psboot = $(bootpath)/petite.boot
 csboot = $(bootpath)/scheme.boot
 custom_boot = custom-boot.ss
-kernel = $(libdir)/kernel.o
+kernel = $(libdir)/libkernel.a
 scheme ?= scheme
+liblz4 = $(libdir)/liblz4.a
+libz = $(libdir)/libz.a
+main = $(libdir)/main.o
 
 runscheme = "$(scheme)" -b "$(bootpath)/petite.boot" -b "$(bootpath)/scheme.boot"
 
 compile-chez-program: compile-chez-program.ss full-chez.a petite-chez.a $(wildcard config.ss)
 	$(runscheme) --compile-imported-libraries --program $< --full-chez --chez-lib-dir . $<
 
-%.a: embed_target.o setup.o stubs.o %_boot.o $(kernel)
-	ar rcs $@ $^
+%.a: %_boot.o embed_target.o setup.o stubs.o $(main) $(kernel) $(liblz4) $(libz)
+	echo -e 'create $@\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod $(main)\naddlib $(kernel)\naddlib $(liblz4)\naddlib $(libz)\nsave\nend' | ar -M
 
 stubs.o: stubs.c
 	$(CC) -c -o $@ $<
@@ -41,7 +44,7 @@ $(fcs): $(psboot) $(csboot) $(custom_boot)
 $(pcs): $(psboot) $(custom_boot)
 	$(runscheme) --script make-boot-file.ss $@ $^
 
-$(psboot) $(csboot) $(kernel):
+$(psboot) $(csboot) $(kernel) $(liblz4) $(libz) $(main):
 	@echo Unable to find "$@". Try running gen-config.ss to set dependency paths
 	@false
 
