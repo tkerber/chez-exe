@@ -23,8 +23,13 @@ runscheme = "$(scheme)" -b "$(bootpath)/petite.boot" -b "$(bootpath)/scheme.boot
 compile-chez-program: compile-chez-program.ss full-chez.a petite-chez.a $(wildcard config.ss)
 	$(runscheme) --compile-imported-libraries --program $< --full-chez --chez-lib-dir . $<
 
-%.a: %_boot.o embed_target.o setup.o stubs.o $(main) $(kernel) $(liblz4) $(libz)
-	echo -e 'create $@\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod $(main)\naddlib $(kernel)\naddlib $(liblz4)\naddlib $(libz)\nsave\nend' | ar -M
+%.a: %_boot.o embed_target.o setup.o stubs.o main.o $(kernel) $(liblz4) $(libz)
+	echo -e 'create $@\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod main.o\naddlib $(kernel)\naddlib $(liblz4)\naddlib $(libz)\nsave\nend' | ar -M
+
+main.o: $(main)
+	cp $(main) $@
+	chmod +w $@
+	strip -N main -N _main $@
 
 stubs.o: stubs.c
 	$(CC) -c -o $@ $<
