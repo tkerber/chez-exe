@@ -13,15 +13,25 @@ psboot = $(bootpath)/petite.boot
 csboot = $(bootpath)/scheme.boot
 custom_boot = custom-boot.ss
 scheme ?= scheme
+ifdef libc
 libs = $(libdir)/libkernel.a $(libdir)/liblz4.a $(libdir)/libz.a $(libdir)/main.o $(libc)/libc.a $(libc)/libm.a $(libc)/libdl.a $(libc)/libpthread.a
+else
+libs = $(libdir)/libkernel.a $(libdir)/liblz4.a $(libdir)/libz.a $(libdir)/main.o
+endif
+
 
 runscheme = "$(scheme)" -b "$(bootpath)/petite.boot" -b "$(bootpath)/scheme.boot"
 
 compile-chez-program: compile-chez-program.ss full-chez.a petite-chez.a $(wildcard config.ss)
 	$(runscheme) --compile-imported-libraries --program $< --full-chez --chez-lib-dir . $<
 
+ifdef libc
 %.a: %_boot.o embed_target.o setup.o stubs.o main.o $(libs)
 	echo -e 'create $@\naddlib $(libc)/libc.a\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod main.o\naddlib $(libdir)/libkernel.a\naddlib $(libdir)/liblz4.a\naddlib $(libdir)/libz.a\naddlib $(libc)/libm.a\naddlib $(libc)/libdl.a\naddlib $(libc)/libpthread.a\nsave\nend' | ar -M
+else 
+%.a: %_boot.o embed_target.o setup.o stubs.o main.o $(libs)
+	echo -e 'create $@\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod main.o\naddlib $(libdir)/libkernel.a\naddlib $(libdir)/liblz4.a\naddlib $(libdir)/libz.a\nsave\nend' | ar -M
+endif
 
 main.o: $(libdir)/main.o
 	cp $(libdir)/main.o $@

@@ -7,7 +7,13 @@
   outputs = { self, nixpkgs, utils, ... }:
     utils.lib.eachDefaultSystem (
       system: let
-        pkgs = nixpkgs.legacyPackages.${system}.pkgsMusl;
+        basePkgs = nixpkgs.legacyPackages.${system};
+        pkgs = {
+          x86_64-darwin = basePkgs;
+          x86_64-linux = basePkgs.pkgsMusl;
+          aarch64-darwin = basePkgs;
+          aarch64-linux = basePkgs.pkgsMusl;
+        }.${system};
         bootpath = "${pkgs.chez}/lib/csv${pkgs.chez.version}/${{
           x86_64-darwin = "ta6osx";
           x86_64-linux = "ta6le";
@@ -16,9 +22,9 @@
         }.${system}}";
         platformSpecificInputs = {
           x86_64-darwin = [ pkgs.darwin.libiconv ];
-          x86_64-linux = [ ];
+          x86_64-linux = [ pkgs.musl ];
           aarch64-darwin = [ pkgs.darwin.libiconv ];
-          aarch64-linux = [ ];
+          aarch64-linux = [ pkgs.musl ];
         }.${system};
       in {
 
@@ -29,7 +35,6 @@
 
           buildInputs = with pkgs; [
             chez
-            musl
           ] ++ platformSpecificInputs;
 
           buildPhase = ''
@@ -38,7 +43,7 @@
             --prefix $out \
             --bindir $out/bin \
             --libdir $out/lib \
-            --libc ${pkgs.musl}/lib \
+            ${if pkgs.lib.hasSuffix "linux" system then "--libc ${pkgs.musl}/lib" else ""} \
             --bootpath ${bootpath} \
             --scheme scheme
           '';
