@@ -10,6 +10,7 @@
       [windows (string-append (getenv "LOCALAPPDATA") "\\chez-exe")]
       [else "/usr/local"])))
 (define libdir (make-parameter #f))
+(define libc (make-parameter #f))
 (define bindir (make-parameter #f))
 
 (define args
@@ -19,12 +20,14 @@
                      "Usage:"
                      "gen-config.ss [--prefix prefix] [--bindir bindir]"
                      "   [--libdir libdir] [--bootpath bootpath]"
-                     "   [--scheme scheme] [c-compiler-arg ...]"
+                     "   [--scheme scheme] [--libc libc]"
+                     "   [c-compiler-arg ...]"
                      ""
                      "  --scheme: path to scheme exe"
                      "  --bootpath: path to boot files"
                      "  --prefix: root path for chez-exe installation"
                      "  --libdir: path to location for install of chez-exe libraries"
+                     "  --libc path to location for install of static libc binaries"
                      "  --bindir: path to location for install of chez-exe binaries"
                      ""
                      " On UNIX-like machines, bindir and libdir default to"
@@ -37,6 +40,7 @@
     ["--bootpath" bootpath]
     ["--prefix" prefixdir]
     ["--libdir" libdir]
+    ["--libc" libc]
     ["--bindir" bindir]))
 
 (unless (libdir)
@@ -76,6 +80,7 @@
          (format "CFLAGS += -m~a" (machine-bits))
          (format "scheme = ~a" (scheme))
          (format "bootpath = ~a" (bootpath))
+         (format "libc = ~a" (libc))
          (format "prefix = ~a" (prefixdir))
          (format "installlibdir = ~a" (libdir))
          (format "installbindir = ~a" (bindir))))

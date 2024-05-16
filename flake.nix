@@ -7,7 +7,7 @@
   outputs = { self, nixpkgs, utils, ... }:
     utils.lib.eachDefaultSystem (
       system: let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = nixpkgs.legacyPackages.${system}.pkgsMusl;
         bootpath = "${pkgs.chez}/lib/csv${pkgs.chez.version}/${{
           x86_64-darwin = "ta6osx";
           x86_64-linux = "ta6le";
@@ -16,9 +16,9 @@
         }.${system}}";
         platformSpecificInputs = {
           x86_64-darwin = [ pkgs.darwin.libiconv ];
-          x86_64-linux = [ pkgs.libuuid ];
+          x86_64-linux = [ ];
           aarch64-darwin = [ pkgs.darwin.libiconv ];
-          aarch64-linux = [ pkgs.libuuid ];
+          aarch64-linux = [ ];
         }.${system};
       in {
 
@@ -29,6 +29,7 @@
 
           buildInputs = with pkgs; [
             chez
+            musl
           ] ++ platformSpecificInputs;
 
           buildPhase = ''
@@ -37,6 +38,7 @@
             --prefix $out \
             --bindir $out/bin \
             --libdir $out/lib \
+            --libc ${pkgs.musl}/lib \
             --bootpath ${bootpath} \
             --scheme scheme
           '';

@@ -100,8 +100,8 @@
 (define solibs
   (case (os-name)
     [linux (if (threaded?)
-               "-ldl -lm -luuid -lpthread"
-               "-ldl -lm -luuid")]
+               "-ldl -lm -lpthread"
+               "-ldl -lm")]
     [macosx "-liconv"]
     [windows "rpcrt4.lib ole32.lib advapi32.lib User32.lib"]))
 
@@ -110,7 +110,7 @@
   [windows
    (system (format "cl /nologo /MD /Fe:~a ~a ~a ~a ~a ~{ ~a~}" exe-name win-main solibs chez-file embed-file compiler-args))]
   [else
-   (system (format "cc -o ~a ~a ~a ~a ~a ~{ ~s~}" exe-name chez-file embed-file mbits solibs compiler-args))])
+   (system (format "cc -no-pie -static -o ~a ~a ~a ~a ~{ ~s~}" exe-name chez-file embed-file mbits compiler-args))])
 
 (display basename)
 (newline)

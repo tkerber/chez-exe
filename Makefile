@@ -12,22 +12,19 @@ libdir ?= $(bootpath)
 psboot = $(bootpath)/petite.boot
 csboot = $(bootpath)/scheme.boot
 custom_boot = custom-boot.ss
-kernel = $(libdir)/libkernel.a
 scheme ?= scheme
-liblz4 = $(libdir)/liblz4.a
-libz = $(libdir)/libz.a
-main = $(libdir)/main.o
+libs = $(libdir)/libkernel.a $(libdir)/liblz4.a $(libdir)/libz.a $(libdir)/main.o $(libc)/libc.a $(libc)/libm.a $(libc)/libdl.a $(libc)/libpthread.a
 
 runscheme = "$(scheme)" -b "$(bootpath)/petite.boot" -b "$(bootpath)/scheme.boot"
 
 compile-chez-program: compile-chez-program.ss full-chez.a petite-chez.a $(wildcard config.ss)
 	$(runscheme) --compile-imported-libraries --program $< --full-chez --chez-lib-dir . $<
 
-%.a: %_boot.o embed_target.o setup.o stubs.o main.o $(kernel) $(liblz4) $(libz)
-	echo -e 'create $@\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod main.o\naddlib $(kernel)\naddlib $(liblz4)\naddlib $(libz)\nsave\nend' | ar -M
+%.a: %_boot.o embed_target.o setup.o stubs.o main.o $(libs)
+	echo -e 'create $@\naddlib $(libc)/libc.a\naddmod $<\naddmod embed_target.o\naddmod setup.o\naddmod stubs.o\naddmod main.o\naddlib $(libdir)/libkernel.a\naddlib $(libdir)/liblz4.a\naddlib $(libdir)/libz.a\naddlib $(libc)/libm.a\naddlib $(libc)/libdl.a\naddlib $(libc)/libpthread.a\nsave\nend' | ar -M
 
-main.o: $(main)
-	cp $(main) $@
+main.o: $(libdir)/main.o
+	cp $(libdir)/main.o $@
 	chmod +w $@
 	strip -N main -N _main $@
 
@@ -49,7 +46,7 @@ $(fcs): $(psboot) $(csboot) $(custom_boot)
 $(pcs): $(psboot) $(custom_boot)
 	$(runscheme) --script make-boot-file.ss $@ $^
 
-$(psboot) $(csboot) $(kernel) $(liblz4) $(libz) $(main):
+$(psboot) $(csboot) $(libs):
 	@echo Unable to find "$@". Try running gen-config.ss to set dependency paths
 	@false
 
