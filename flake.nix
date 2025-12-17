@@ -21,9 +21,9 @@
           aarch64-linux = "tarm64le";
         }.${system}}";
         platformSpecificInputs = {
-          x86_64-darwin = [ pkgs.darwin.libiconv ];
+          x86_64-darwin = [ ];
           x86_64-linux = [ pkgs.musl ];
-          aarch64-darwin = [ pkgs.darwin.libiconv ];
+          aarch64-darwin = [ ];
           aarch64-linux = [ pkgs.musl ];
         }.${system};
       in {
