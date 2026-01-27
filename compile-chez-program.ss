@@ -111,6 +111,8 @@
    (system (format "cl /nologo /MD /Fe:~a ~a ~a ~a ~a ~{ ~a~}" exe-name win-main solibs chez-file embed-file compiler-args))]
   [macosx
    (system (format "cc -o ~a ~a ~a ~a ~a ~{ ~s~}" exe-name chez-file embed-file solibs mbits compiler-args))]
+  [linux-arm
+   (system (format "cc -no-pie -static -o ~a ~a ~a ~{ ~s~}" exe-name chez-file embed-file compiler-args))]
   [linux
    (system (format "cc -no-pie -static -o ~a ~a ~a ~a ~{ ~s~}" exe-name chez-file embed-file mbits compiler-args))])
 
