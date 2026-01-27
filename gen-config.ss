@@ -90,7 +90,7 @@
    (with-output-to-file "make.in"
      (lambda ()
        (printlns
-         (format "CFLAGS += -m~a" (machine-bits))
+         (format "CFLAGS += -DALALALALA~a" (machine-bits))
          (format "scheme = ~a" (scheme))
          (format "bootpath = ~a" (bootpath))
          (if (libc)
