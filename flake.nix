@@ -33,8 +33,7 @@
           version = "0.0.1";
           src = ./.;
 
-          NIX_CFLAGS_COMPILE = pkgs.lib.optionalString pkgs.stdenv.isLinux "-static";
-          NIX_LDFLAGS = pkgs.lib.optionalString pkgs.stdenv.isLinux "-static";
+          nativeBuildInputs = pkgs.lib.optionals pkgs.stdenv.isLinux [ pkgs.patchelf ];
 
           buildInputs = with pkgs; [
             chez
@@ -49,6 +48,14 @@
             ${if pkgs.lib.hasSuffix "linux" system then "--libc ${pkgs.musl}/lib" else ""} \
             --bootpath ${bootpath} \
             --scheme scheme
+
+            # Linux-specific fix: Ensure the binary can find the Musl loader
+            ${pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+              if [ -f compile-chez-program ]; then
+                echo "Patching Linux binary interpreter..."
+                patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" compile-chez-program
+              fi
+            ''}
           '';
         };
       }
