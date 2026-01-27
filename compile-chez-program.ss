@@ -99,7 +99,7 @@
 
 (define solibs
   (case (os-name)
-    [linux (if (threaded?)
+    [linux-arm (if (threaded?)
                "-ldl -lm -lpthread"
                "-ldl -lm")]
     [linux (if (threaded?)
