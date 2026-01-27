@@ -73,6 +73,19 @@
          (format "installbindir = ~a" (bindir))
          (format "installlibdir = ~a" (libdir))))
      '(replace))]
+  [linux-arm
+   (with-output-to-file "make.in"
+     (lambda ()
+       (printlns
+         (format "scheme = ~a" (scheme))
+         (format "bootpath = ~a" (bootpath))
+         (if (libc)
+             (format "libc = ~a" (libc))
+             "")
+         (format "prefix = ~a" (prefixdir))
+         (format "installlibdir = ~a" (libdir))
+         (format "installbindir = ~a" (bindir))))
+     '(replace))]
   [else
    (with-output-to-file "make.in"
      (lambda ()

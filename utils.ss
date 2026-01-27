@@ -1,7 +1,8 @@
 (define (os-name)
   (case (machine-type)
     [(a6fb ta6fb i3fb ti3fb tarm64fb) 'freebsd]
-    [(a6le arm32le i3le ppc32le ta6le ti3le tppc32le tarm64le) 'linux]
+    [(a6le i3le ppc32le ta6le ti3le tppc32le tarm64le) 'linux]
+    [(arm32le tarm64le) 'linux-arm]
     [(a6nb i3nb ta6nb ti3nb tarm64nb) 'netbsd]
     [(a6nt i3nt ta6nt ti3nt tarm64nt) 'windows]
     [(a6ob i3ob ta6ob ti3ob tarm64ob) 'openbsd]
