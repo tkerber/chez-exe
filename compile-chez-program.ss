@@ -102,6 +102,9 @@
     [linux (if (threaded?)
                "-ldl -lm -lpthread"
                "-ldl -lm")]
+    [linux (if (threaded?)
+               "-ldl -lm -lpthread"
+               "-ldl -lm")]
     [macosx "-liconv"]
     [windows "rpcrt4.lib ole32.lib advapi32.lib User32.lib"]))
 
