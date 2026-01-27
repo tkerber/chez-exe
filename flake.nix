@@ -33,6 +33,9 @@
           version = "0.0.1";
           src = ./.;
 
+          NIX_CFLAGS_COMPILE = pkgs.lib.optionalString pkgs.stdenv.isLinux "-static";
+          NIX_LDFLAGS = pkgs.lib.optionalString pkgs.stdenv.isLinux "-static";
+
           buildInputs = with pkgs; [
             chez
           ] ++ platformSpecificInputs;
